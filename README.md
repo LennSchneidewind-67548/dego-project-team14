@@ -1,5 +1,8 @@
 # DEGO Project - Team 14
 
+## Executive Summary
+
+
 ## Team Members
 
 | Role | Name | Student ID |
@@ -12,8 +15,34 @@
 ## Project Description
 Credit scoring bias analysis for DEGO course.
 
-## Structure
-- 'data/' - Dataset files
-- 'notebooks/' - Jupyter analysis notebooks
-- 'src/' - Python source code
-- 'reports/' - Final deliverables
+## Data Quality Findings
+
+
+## Bias Detection & Fairness
+
+## Privacy Assessment
+
+
+## Governance Recommendations
+
+
+## Repository Structure
+project-team14/
+├── README.md
+├── data/
+│   └── raw_credit_applications.json
+├── notebooks/
+│   ├── 01-data-engineer.ipynb
+│   ├── 02-bias-analysis.ipynb
+│   └── 03-privacy.ipynb
+├── src/
+│   └── fairness_utils.py
+└── presentation/
+    └── final deliverables
+
+---
+
+## How to Run
+
+
+## Individual Contributions
