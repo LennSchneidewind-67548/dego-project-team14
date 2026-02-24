@@ -12,10 +12,41 @@
 - [ ] All Members commited their name to README.md
 
 ### Analysis
-- [ ] `01-data-quality.ipynb` — complete and runs without errors
-- [ ] `02-bias-analysis.ipynb` — complete and runs without errors
-- [ ] `03-privacy-demo.ipynb` — complete and runs without errors
-- [ ] `src/fairness_utils.py` — reusable functions extracted
+
+#### 01-data-engineer.ipynb
+- [ ] Load and parse nested JSON into flat DataFrame
+- [ ] Identify and count duplicate records
+- [ ] Identify inconsistent data types (e.g. income stored as string)
+- [ ] Identify missing / null values — per-column % missing
+- [ ] Identify inconsistent categorical coding (e.g. gender as `M` / `Male` / `male`)
+- [ ] Identify invalid / impossible values (e.g. negative credit history months)
+- [ ] Identify inconsistent date formats
+- [ ] Quantify every issue: count + % of affected records
+- [ ] Demonstrate remediation steps in code
+- [ ] Notebook runs clean (restart kernel → run all)
+
+#### 02-data-scientist.ipynb
+- [ ] Calculate gender approval rates (female vs. male)
+- [ ] Calculate Disparate Impact ratio — `DI = approval_rate(female) / approval_rate(male)`
+- [ ] Interpret DI against four-fifths rule (threshold: 0.8)
+- [ ] Analyse age-based approval patterns
+- [ ] Proxy discrimination analysis — correlate `zip_code` and `spending_behavior` with protected attributes
+- [ ] Investigate interaction effects (e.g. age × gender)
+- [ ] Visualizations for all bias patterns
+- [ ] Notebook runs clean (restart kernel → run all)
+
+#### 03-governance-officer.ipynb
+- [ ] Identify all PII fields: `full_name`, `email`, `ssn`, `ip_address`, `date_of_birth`, `zip_code`
+- [ ] Demonstrate pseudonymization of ≥1 PII field (e.g. SHA-256 hash of `ssn`)
+- [ ] Map findings to GDPR: Art. 6 (lawful basis), Art. 5 (minimization + storage limitation), Art. 17 (erasure)
+- [ ] Reference EU AI Act — credit scoring as high-risk (Annex III)
+- [ ] Propose concrete governance controls (audit trail, human oversight, consent, retention policy)
+- [ ] Notebook runs clean (restart kernel → run all)
+
+#### src/fairness_utils.py
+- [ ] DI ratio function extracted and importable
+- [ ] Demographic parity difference function extracted
+- [ ] Functions used/imported inside `02-data-scientist.ipynb`
 
 ### README
 - [ ] Team members filled in (all 4 names + student IDs)
