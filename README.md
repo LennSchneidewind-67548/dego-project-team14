@@ -31,6 +31,7 @@ Credit scoring bias analysis for DEGO course.
 dego-project-team14/
 ├── README.md
 ├── data/
+│   └── raw_credit_applications.json
 ├── notebooks/
 │   ├── 01-data-engineer.ipynb
 │   ├── 02-data-scientist.ipynb
