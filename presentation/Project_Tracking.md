@@ -9,7 +9,7 @@
 - [x] All 4 members added and onboarded
 - [x] Folder structure created (`data/`, `notebooks/`, `src/`, `presentation/`)
 - [x] Dataset added to `data/`
-- [ ] All Members commited their name to README.md
+- [ ] Team members filled in README.md (all 4 names + student IDs)
 
 ### Analysis
 
@@ -49,7 +49,6 @@
 - [ ] Functions used/imported inside `02-data-scientist.ipynb`
 
 ### README
-- [ ] Team members filled in (all 4 names + student IDs)
 - [ ] Executive summary written
 - [ ] Data quality table filled in with real numbers
 - [ ] Bias section filled in (DI ratio value + interpretation)
