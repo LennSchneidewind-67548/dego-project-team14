@@ -27,6 +27,7 @@ Credit scoring bias analysis for DEGO course.
 
 
 ## Repository Structure
+```
 dego-project-team14/
 ├── README.md
 ├── data/
@@ -38,7 +39,7 @@ dego-project-team14/
 │   └── fairness_utils.py
 └── presentation/
     └── final deliverables
-
+```
 ---
 
 ## How to Run
