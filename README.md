@@ -2,10 +2,12 @@
 
 ## Team Members
 
-- Data Engineer: Lenn Louis Schneidewind, Student_ID: 67548
-- Data Analyst:
-- Governance Officer:
-- Product Lead: Leon Werner Schmidt - Student_ID: 71644
+| Role | Name | Student ID |
+|------|------|------------|
+| Data Engineer | Lenn Louis Schneidewind | 67548 |
+| Data Scientist | | |
+| Governance Officer | | |
+| Product Lead | Leon Werner Schmidt | 71644 |
 
 ## Project Description
 Credit scoring bias analysis for DEGO course.
