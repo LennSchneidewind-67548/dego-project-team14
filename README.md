@@ -33,9 +33,9 @@ dego-project-team14/
 ├── data/
 │   └── raw_credit_applications.json
 ├── notebooks/
-│   ├── 01-data-engineer.ipynb
-│   ├── 02-data-scientist.ipynb
-│   └── 03-governance-officer.ipynb
+│   ├── 01-data-quality.ipynb
+│   ├── 02-bias-analysis.ipynb
+│   └── 03-privacy-demo.ipynb
 ├── src/
 │   └── fairness_utils.py
 └── presentation/
