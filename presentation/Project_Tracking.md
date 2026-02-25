@@ -13,7 +13,7 @@
 
 ### Analysis
 
-#### 01-data-engineer.ipynb
+#### 01-data-engineer.ipynb -> Finish until 24.02.26 Afternoon
 - [ ] Load and parse nested JSON into flat DataFrame
 - [ ] Identify and count duplicate records
 - [ ] Identify inconsistent data types (e.g. income stored as string)
@@ -25,7 +25,7 @@
 - [ ] Demonstrate remediation steps in code
 - [ ] Notebook runs clean (restart kernel → run all)
 
-#### 02-data-scientist.ipynb
+#### 02-data-scientist.ipynb -> Finish until 27.02.26
 - [ ] Calculate gender approval rates (female vs. male)
 - [ ] Calculate Disparate Impact ratio — `DI = approval_rate(female) / approval_rate(male)`
 - [ ] Interpret DI against four-fifths rule (threshold: 0.8)
@@ -35,7 +35,7 @@
 - [ ] Visualizations for all bias patterns
 - [ ] Notebook runs clean (restart kernel → run all)
 
-#### 03-governance-officer.ipynb
+#### 03-governance-officer.ipynb -> Finish until 27.02.26
 - [ ] Identify all PII fields: `full_name`, `email`, `ssn`, `ip_address`, `date_of_birth`, `zip_code`
 - [ ] Demonstrate pseudonymization of ≥1 PII field (e.g. SHA-256 hash of `ssn`)
 - [ ] Map findings to GDPR: Art. 6 (lawful basis), Art. 5 (minimization + storage limitation), Art. 17 (erasure)
@@ -43,12 +43,12 @@
 - [ ] Propose concrete governance controls (audit trail, human oversight, consent, retention policy)
 - [ ] Notebook runs clean (restart kernel → run all)
 
-#### src/fairness_utils.py
+#### src/fairness_utils.py (optional -> Probably won't be needed in our implementation)
 - [ ] DI ratio function extracted and importable
 - [ ] Demographic parity difference function extracted
 - [ ] Functions used/imported inside `02-data-scientist.ipynb`
 
-### README
+### README -> Finish till 28.02.2026
 - [ ] Executive summary written
 - [ ] Data quality table filled in with real numbers
 - [ ] Bias section filled in (DI ratio value + interpretation)
