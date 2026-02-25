@@ -14,15 +14,15 @@
 ### Analysis
 
 #### 01-data-engineer.ipynb -> Finish until 24.02.26 Afternoon
-- [ ] Load and parse nested JSON into flat DataFrame
-- [ ] Identify and count duplicate records
-- [ ] Identify inconsistent data types (e.g. income stored as string)
-- [ ] Identify missing / null values — per-column % missing
+- [x] Load and parse nested JSON into flat DataFrame
+- [x] Identify and count duplicate records
+- [x] Identify inconsistent data types (e.g. income stored as string)
+- [x] Identify missing / null values — per-column % missing
 - [ ] Identify inconsistent categorical coding (e.g. gender as `M` / `Male` / `male`)
-- [ ] Identify invalid / impossible values (e.g. negative credit history months)
-- [ ] Identify inconsistent date formats
-- [ ] Quantify every issue: count + % of affected records
-- [ ] Demonstrate remediation steps in code
+- [x] Identify invalid / impossible values (e.g. negative credit history months)
+- [x] Identify inconsistent date formats
+- [x] Quantify every issue: count + % of affected records
+- [x] Demonstrate remediation steps in code
 - [ ] Notebook runs clean (restart kernel → run all)
 
 #### 02-data-scientist.ipynb -> Finish until 27.02.26
