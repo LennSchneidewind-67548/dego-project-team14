@@ -9,7 +9,7 @@
 |------|------|------------|
 | Data Engineer | Lenn Louis Schneidewind | 67548 |
 | Data Scientist | | |
-| Governance Officer | | |
+| Governance Officer | Eduarda Dionísio | 56503 |
 | Product Lead | Leon Werner Schmidt | 71644 |
 
 ## Project Description
