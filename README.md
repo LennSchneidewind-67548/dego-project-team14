@@ -8,7 +8,7 @@
 | Role | Name | Student ID |
 |------|------|------------|
 | Data Engineer | Lenn Louis Schneidewind | 67548 |
-| Data Scientist | | |
+| Data Scientist | Fatima Zubair | 70319 |
 | Governance Officer | Eduarda Dionísio | 56503 |
 | Product Lead | Leon Werner Schmidt | 71644 |
 
