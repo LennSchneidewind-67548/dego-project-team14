@@ -36,7 +36,13 @@ The ZIP code bias analysis shows that ZIP behaves as a strong proxy for gender r
 
 
 ## Governance Recommendations
+#Proposed Governance Controls
+In the case of NovaCred, since it works high-risk personal data and its processing for a credit application, these are the suggested governance controls to ensure regulatory complicance, accountability and ethical use: 
 
+- Audit Trail: Every decision model should be automatically logged with a timestamp, the input features that were used and the output decision (if it was rejected or not). This allows NovaCred to explain any decisions, for customers or for auditory services, creating a traceable history.
+- Human oversight: In borderline cases (e.g., applicants with credit score right at the approval threshold) should be manually reviewed instead of receiving a fully automated decision. This is required, by EU AI Act and GDPR (Article 22), to protect individuals from purely algorithmic decisions that significantly affects them.
+- Consent and Transparency: Applicants must be clearly informed that an algorithm will evaluate their application and give explicit consent, before processing their data through an automated system. This is only lawful, under certain conditions, including the data subject’s consent.
+- Retention and Data Lifecyle Policy: NovaCred must define a maximum retention period (e.g., 5 years), after which all PII fields must be deleted or fully anonymized. This is required by the Storage Limitation Principle (Article 5) that, as previously said, prohibits keeping personal information longer than necessary for its original purpose.
 
 ## Repository Structure
 ```
