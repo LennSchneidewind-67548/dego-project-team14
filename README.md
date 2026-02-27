@@ -36,11 +36,11 @@ The ZIP code bias analysis shows that ZIP behaves as a strong proxy for gender r
 
 
 ## Governance Recommendations
-###Governance Overview
+### Governance Overview
 This section evaluates the dataset and credit scoring model from a governance and regulatory compliance perspective.
 The main objetive is to identify and analyse the PII (Personal Identifiable Information), assess GDPR compliance, classify the system under the EU AI Act and propose governance controls.
 
-###Identification of the Data
+### Identification of the Data
 Identification of Personal Data (PII) Under the Article 4 of the GDPR, personal data is means “any informations relating to an identified or identifiable natural person (the data subject)”, directly or indirectly. These identifiers has one or more factors related with physical, cultural, economic or social identity of a (natural) person.  Based on this definition, the dataset used for the credit score analysis contains some attributes that are considered as Personal Identifiable Information. 
 
 Direct identifiers enable to identify an individual immediately such as:
