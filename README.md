@@ -64,6 +64,8 @@ The use of personal data in credit scoring must be assessed based on the key GDP
 - The Article 6 (Lawfulness of Processing) means that processing personal data (for credit scoring) relies on contractural necessity and legitimate interest, requiring a elavuate of the application prior to entering into a contract and demonstrating that the organization’s interests do not overrida the fundamental rights and freedoms of the data subject, respectively. In our case, analysing the credit score is a legimate interest and is a contractual necessity.
 - The Article 17 (Right to Erasure or Right to “be forgotten”) indicate that, under certain conditions, users can request to delete their personal data (backups included). In our project, no erasure mechanism was demonstrated in the pipeline.
 
+### EU AI Act Reference
+Under Annex III of the EU AI Act, AI systems used for credit scoring and evaluation of creditworthiness are classified as High-Risk AI systems. This classification imposes substantial compliance obligations on providers and deployers, e.g., a robust data governance and quality control, human oversight measures a documented risk management system or transparency and user information requirements. The fairness metrics computed in 02-data-scientist.ipynb (Disparate Impact ratio and Demographic Parity) are directly relevant. Under the EU AI Act, high-risk systems must demonstrate they do not produce discriminatory outcomes across protected groups (gender, age). Those findings should be reviewed as part of any conformity assessment.
 
 
 ## Repository Structure
