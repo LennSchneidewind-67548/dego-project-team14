@@ -55,6 +55,15 @@ Indirect identifiers includes attributes that may not identify a person directly
 - zip_code
 Even tough these fields are not always uniquely identifying on their own, they relate to identifiable individuals when processed in combination, under the scope of GDPR.
 
+### Pseudonymization Measures
+Pseudonymization refers to the processing of personal data in such a way that it can no longer be attributed to a specific data subject without the use of additional information. Pseudonymization reduces the risk of (re-)identification while maintaining data utility for analytical purposes. In this case, sensitive identifiers such as the Social Security Number (SSN) are pseudonymized using a encrypted hashing function (e.g., SHA-256). The original SSN values are replaced with hashed representations, thereby preventing direct identification while preserving uniqueness for analytical consistency. Also, this is a one-way measure, it means that, it is not possible to reverse the hash back to the ssn without the original value.
+
+### GDPR Provisions
+The use of personal data in credit scoring must be assessed based on the key GDPR provisions:
+- The Article 5 (Principles Relating of Processing of Personal Data) establishes core data protection principle - data minimization. This implies that only data strictly necessary for the credit risk assessment are going to be processed ( e.g., ssn should not be retained beyond identity verification purposes and direct identifiers such as name may not be relevant (and required) for model training. Also, the Article 5 limits the storage of tha data only for as long as necessary (e.g., duration of data storage or periodic review of stored datasets).
+- The Article 6 (Lawfulness of Processing) means that processing personal data (for credit scoring) relies on contractural necessity and legitimate interest, requiring a elavuate of the application prior to entering into a contract and demonstrating that the organization’s interests do not overrida the fundamental rights and freedoms of the data subject, respectively. In our case, analysing the credit score is a legimate interest and is a contractual necessity.
+- The Article 17 (Right to Erasure or Right to “be forgotten”) indicate that, under certain conditions, users can request to delete their personal data (backups included). In our project, no erasure mechanism was demonstrated in the pipeline.
+
 
 
 ## Repository Structure
