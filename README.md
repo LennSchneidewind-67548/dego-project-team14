@@ -36,7 +36,8 @@ The ZIP code bias analysis shows that ZIP behaves as a strong proxy for gender r
 
 
 ## Governance Recommendations
-
+#Pseudonymization Measures 
+Pseudonymization refers to the processing of personal data in such a way that it can no longer be attributed to a specific data subject without the use of additional information. Pseudonymization reduces the risk of (re-)identification while maintaining data utility for analytical purposes. In this case, sensitive identifiers such as the Social Security Number (ssn) are pseudonymized (e.g., SHA-256). The original values are replaced by hasing representations. This is used to prevent direct identification and to preserve uniqueness for analytical consistency. Also, this is a one-way measure, it means that, it is not possible to reverse the hash back to the ssn without the original value.
 
 ## Repository Structure
 ```
