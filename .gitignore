@@ -1,3 +1,4 @@
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -8,6 +9,7 @@ __pycache__/
 
 # Mac DS_Store file
 .DS_Store
+Thumbs.db
 
 # Distribution / packaging
 .Python
@@ -199,6 +201,8 @@ cython_debug/
 
 # Project data files
 data/**
+data/*.csv
+data/*.xlsx
 !data/.gitkeep
 .github/
 
