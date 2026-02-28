@@ -23,7 +23,8 @@
 - [x] Identify inconsistent date formats
 - [x] Quantify every issue: count + % of affected records
 - [x] Demonstrate remediation steps in code
-- [ ] Notebook runs clean (restart kernel → run all)
+- [x] Notebook runs clean (restart kernel → run all)
+- [ ] Finished review of data-engineer
 
 #### 02-data-scientist.ipynb -> Finish until 27.02.26
 - [ ] Calculate gender approval rates (female vs. male)
