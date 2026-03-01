@@ -9,33 +9,38 @@
 - [x] All 4 members added and onboarded
 - [x] Folder structure created (`data/`, `notebooks/`, `src/`, `presentation/`)
 - [x] Dataset added to `data/`
-- [ ] Team members filled in README.md (all 4 names + student IDs)
+- [x] Team members filled in README.md (all 4 names + student IDs)
 
 ### Analysis
 
-#### 01-data-engineer.ipynb -> Finish until 24.02.26 Afternoon
-- [ ] Load and parse nested JSON into flat DataFrame
-- [ ] Identify and count duplicate records
-- [ ] Identify inconsistent data types (e.g. income stored as string)
-- [ ] Identify missing / null values — per-column % missing
-- [ ] Identify inconsistent categorical coding (e.g. gender as `M` / `Male` / `male`)
-- [ ] Identify invalid / impossible values (e.g. negative credit history months)
-- [ ] Identify inconsistent date formats
-- [ ] Quantify every issue: count + % of affected records
-- [ ] Demonstrate remediation steps in code
+#### 01-data-quality.ipynb -> Finish until 24.02.26 Afternoon
+- [x] Load and parse nested JSON into flat DataFrame
+- [x] Identify and count duplicate records
+- [x] Identify inconsistent data types (e.g. income stored as string)
+- [x] Identify missing / null values — per-column % missing
+- [x] Identify inconsistent categorical coding (e.g. gender as `M` / `Male` / `male`)
+- [x] Identify invalid / impossible values (e.g. negative credit history months)
+- [x] Identify inconsistent date formats
+- [x] Quantify every issue: count + % of affected records
+- [x] Demonstrate remediation steps in code
+- [x] Notebook runs clean (restart kernel → run all)
+
+#### 02-bias-analysis.ipynb -> Finish until 27.02.26
+- [x] Calculate gender approval rates (female vs. male)
+- [x] Calculate Disparate Impact ratio — `DI = approval_rate(female) / approval_rate(male)`
+- [x] Interpret DI against four-fifths rule (threshold: 0.8)
+- [ ] Analyse age-based approval patterns — also compute DI for 50+ vs 30–50 (currently only <30 vs 30–50)
+- [ ] Proxy discrimination analysis — correlate `zip_code` and `spending_behavior` with protected attributes; use Cramér's V instead of count-based observation
+- [ ] Investigate interaction effects (e.g. age × gender) — add cross-tabulation and interaction plot
+- [ ] Visualisations for all bias patterns — add 0.8 four-fifths reference line, interaction plot, proxy correlation heatmap
+- [ ] Load cleaned dataset from Lenn (`cleaned_credit_applications.csv`) instead of raw JSON
+- [ ] Remove redundant gender cleaning code — drop `M`→`Male` / `F`→`Female` normalisation (already done in data-quality notebook)
+- [ ] Add statistical test — chi-squared test (and/or fairlearn / AIF360) to back up DI findings
+- [ ] Extend outcome metrics — analyse interest rates and approved amounts by gender and age group, not just approval rates
+- [ ] Strengthen interpretations — discuss confounders (income, debt-to-income) and suggest concrete mitigation steps (reweighting, threshold adjustment, feature removal)
 - [ ] Notebook runs clean (restart kernel → run all)
 
-#### 02-data-scientist.ipynb -> Finish until 27.02.26
-- [ ] Calculate gender approval rates (female vs. male)
-- [ ] Calculate Disparate Impact ratio — `DI = approval_rate(female) / approval_rate(male)`
-- [ ] Interpret DI against four-fifths rule (threshold: 0.8)
-- [ ] Analyse age-based approval patterns
-- [ ] Proxy discrimination analysis — correlate `zip_code` and `spending_behavior` with protected attributes
-- [ ] Investigate interaction effects (e.g. age × gender)
-- [ ] Visualizations for all bias patterns
-- [ ] Notebook runs clean (restart kernel → run all)
-
-#### 03-governance-officer.ipynb -> Finish until 27.02.26
+#### 03-privacy-demo.ipynb -> Finish until 27.02.26
 - [ ] Identify all PII fields: `full_name`, `email`, `ssn`, `ip_address`, `date_of_birth`, `zip_code`
 - [ ] Demonstrate pseudonymization of ≥1 PII field (e.g. SHA-256 hash of `ssn`)
 - [ ] Map findings to GDPR: Art. 6 (lawful basis), Art. 5 (minimization + storage limitation), Art. 17 (erasure)
