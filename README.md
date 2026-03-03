@@ -72,6 +72,16 @@ Even though these fields are not always uniquely identifying on their own, they 
 
 Additionally, spending_behavior is flagged as sensitive behavioral data. Although it is not a direct identifier, it reveals patterns about a person's financial habits and lifestyle, which can be used to infer protected characteristics (e.g., religion, health status). Under GDPR, behavioral data that carries this inferential risk should be treated with the same caution as traditional PII.
 
+| Field | PII Type | Risk Level |
+|---|---|---|
+| `full_name` | Direct identifier | High |
+| `email` | Direct identifier | High |
+| `ssn` | Sensitive identifier | Critical |
+| `ip_address` | Quasi-identifier | Medium |
+| `date_of_birth` | Quasi-identifier | Medium |
+| `zip_code` | Quasi-identifier | Low |
+| `spending_behavior` | Sensitive behavioral data | Medium-High |
+
 ### Pseudonymization Measures
 Pseudonymization refers to the processing of personal data in such a way that it can no longer be attributed to a specific data subject without the use of additional information. Pseudonymization reduces the risk of (re-)identification while maintaining data utility for analytical purposes. In this case, sensitive identifiers such as the Social Security Number (SSN) are pseudonymized using an encrypted hashing function (e.g., SHA-256). The original SSN values are replaced with hashed representations, thereby preventing direct identification while preserving uniqueness for analytical consistency. Also, this is a one-way measure, it means that, it is not possible to reverse the hash back to the ssn without the original value.
 
