@@ -21,6 +21,38 @@ This report presents the findings of a data governance audit conducted on NovaCr
 ## Project Description
 NovaCred is a fintech startup that uses machine learning to make credit decisions. Following a regulatory inquiry about potential discrimination in their lending practices, our team was hired to audit the data for quality issues, detect bias patterns in historical decisions, propose governance controls, and demonstrate compliance with GDPR and AI Act requirements.
 
+## Data Quality Findings
+
+The data quality analysis (`01-data-quality.ipynb`) audited the raw dataset of 502 credit applications across four quality dimensions. All issues were quantified and remediated in code, resulting in a cleaned dataset of 500 records (99.6% retention rate).
+
+### Completeness
+- **13 out of 20 columns** contained missing values after flattening the nested JSON.
+- `notes` (99.6% missing) and `loan_purpose` (90.0% missing) had the highest missingness but are non-critical optional fields.
+- `processing_timestamp` was missing for 87.7% of records.
+- `financials.annual_salary` was identified as a mislabeled duplicate of `financials.annual_income` the 5 records with `annual_salary` values were exactly the 5 records missing `annual_income`. These were merged, recovering all income data.
+- After standardizing missing value representations (empty strings, whitespace), 14 additional missing values were identified.
+- **Critical fields** (income, loan decision, debt-to-income) had **0% missingness** all records are usable for core analysis.
+
+### Consistency
+- **Data type mismatch**: `financials.annual_income` was stored as `object` (string) instead of numeric. Converted to `float64`.
+- **Gender coding**: 4 distinct representations found (`Male`: 195, `Female`: 193, `F`: 58, `M`: 53, plus 3 missing). Standardized all to `Male`/`Female`.
+- **Date formats**: `processing_timestamp` and `applicant_info.date_of_birth` were stored as strings. Converted to `datetime64` with 0 conversion failures.
+- **Spending categories**: 15 unique categories with 0 whitespace or encoding inconsistencies.
+
+### Validity
+- **Negative credit history months**: 2 records (0.4%) had negative values. Imputed with median (48.0 months).
+- **Non-positive income**: 1 record (0.2%) had an invalid income value. Imputed with mean ($82,735).
+- **Future dates of birth**: 0 records — all DOBs were valid.
+- **Invalid ages**: 0 records outside the 18–120 range.
+- **Invalid email formats**: 4 records (0.8%) had malformed email addresses. Set to NaN.
+- **Spending amounts**: All 827 nested spending entries were valid (0 non-numeric, 0 negative, 0 zero).
+- All imputed values are flagged in dedicated columns (`income_imputed`, `credit_history_imputed`) for transparency.
+
+### Accuracy
+- **0 exact duplicate rows** found.
+- **2 duplicate application IDs** detected (4 rows sharing 2 IDs). Removed 2 duplicate records, keeping the first occurrence of each.
+- Final dataset: **500 unique records** across 24 columns.
+
 ## Bias Detection & Fairness
 
 The bias analysis (`02-bias-analysis.ipynb`) investigates disparate impact across gender and age, proxy discrimination via ZIP code, interaction effects, and rejection reason patterns.
