@@ -26,7 +26,7 @@ NovaCred is a fintech startup that uses machine learning to make credit decision
 The data quality analysis (`01-data-quality.ipynb`) audited the raw dataset of 502 credit applications across four quality dimensions. All issues were quantified and remediated in code, resulting in a cleaned dataset of 500 records (99.6% retention rate).
 
 ### Completeness
-- **13 out of 20 columns** contained missing values after flattening the nested JSON.
+- **13 out of 21 columns** contained missing values after flattening the nested JSON.
 - `notes` (99.6% missing) and `loan_purpose` (90.0% missing) had the highest missingness but are non-critical optional fields.
 - `processing_timestamp` was missing for 87.7% of records.
 - `financials.annual_salary` was identified as a mislabeled duplicate of `financials.annual_income` the 5 records with `annual_salary` values were exactly the 5 records missing `annual_income`. These were merged, recovering all income data.
