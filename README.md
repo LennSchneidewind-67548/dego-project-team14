@@ -2,6 +2,12 @@
 
 ## Executive Summary
 
+This report presents the findings of a data governance audit conducted on NovaCred's credit application dataset (502 records). Acting as a Data Governance Task Force, we identified and remediated data quality issues across four dimensions, detected statistically significant bias against female and younger applicants, and assessed the system's compliance with GDPR and the EU AI Act.
+
+**Key findings:**
+- **Data quality**: 6 categories of issues identified and remediated: Duplicate records (2), inconsistent data types (income stored as string), 4 gender coding variants, inconsistent date formats, invalid values (negative credit history, non-positive income, invalid emails), and missing/incomplete fields across 13 columns. Final dataset retention rate: 99.6%.
+- **Bias**: The gender disparate impact ratio is **0.77** (below the 0.80 four-fifths threshold), confirmed as statistically significant (p = 0.0008). A logistic regression controlling for financial covariates shows gender remains a significant predictor of approval. Applicants under 30 face a DI of **0.62** against the 30–50 group. ZIP code acts as a strong gender proxy (Cramer's V = 0.63).
+- **Governance gaps**: 7 PII fields stored without protection, no consent tracking mechanism, no data retention policy, no erasure mechanism, and no audit trail for automated decisions. Credit scoring is classified as high-risk under the EU AI Act (Annex III, 5b), requiring conformity assessment before deployment.
 
 ## Team Members
 
@@ -9,68 +15,96 @@
 |------|------|------------|
 | Data Engineer | Lenn Louis Schneidewind | 67548 |
 | Data Scientist | Fatima Zubair | 70319 |
-| Governance Officer | Eduarda Dionísio | 56503 |
+| Governance Officer | Eduarda Dionisio | 56503 |
 | Product Lead | Leon Werner Schmidt | 71644 |
 
 ## Project Description
-Credit scoring bias analysis for DEGO course.
-
-## Data Quality Findings
-
+NovaCred is a fintech startup that uses machine learning to make credit decisions. Following a regulatory inquiry about potential discrimination in their lending practices, our team was hired to audit the data for quality issues, detect bias patterns in historical decisions, propose governance controls, and demonstrate compliance with GDPR and AI Act requirements.
 
 ## Bias Detection & Fairness
 
-### Gender bias – disparate impact
+The bias analysis (`02-bias-analysis.ipynb`) investigates disparate impact across gender and age, proxy discrimination via ZIP code, interaction effects, and rejection reason patterns.
 
-We normalize `applicant_info.gender` into a cleaned `gender_clean` field with the categories `Male` and `Female` (mapping `M`→`Male` and `F`→`Female`, keeping other values as is). Records with missing or invalid gender remain in the dataset but are excluded when we need a clear binary comparison.
+### Gender bias — disparate impact
 
-- Approval rate (Male): **65.7%**
+Gender values were standardized in the data quality pipeline (`M`/`F` mapped to `Male`/`Female`). Records with missing or invalid gender are excluded from binary comparisons.
+
+- Approval rate (Male): **65.9%**
 - Approval rate (Female): **50.6%**
-- Disparate impact ratio (Female vs Male): **0.77**
-- Demographic parity difference (Female − Male): **−15.1 percentage points**
+- Disparate impact ratio (Female vs Male): **0.768**
+- Demographic parity difference (Female - Male): **-15.2 percentage points**
 
-A disparate impact ratio of 0.77 (female approval rate divided by male approval rate) is below the 0.80 four‑fifths‑rule threshold, indicating potential disparate impact against female applicants that requires governance attention.[file:1] The demographic parity gap of roughly −15 percentage points reinforces that women are materially less likely to be approved than men. Among approved loans, average interest rates and approved amounts are similar for male and female borrowers, so the main fairness concern is the **probability of approval**, not pricing differences among those who are approved.
+A DI ratio of 0.768 is below the 0.80 four-fifths-rule threshold, indicating potential disparate impact against female applicants. A chi-square test confirms this is statistically significant (chi-sq = 11.16, p = 0.0008). Among approved loans, average interest rates are similar across genders, but females receive lower average approved amounts (46,480 vs 48,988), suggesting disparity extends beyond the approval decision.
 
-### Age‑based approval patterns
+### Confounder-controlled analysis
 
-To analyze age, we convert `applicant_info.date_of_birth` to a proper datetime and compute approximate age at application. Invalid or missing dates are set to `NaT`, and the corresponding ages are `NaN`; these records are excluded from age‑band comparisons but are documented as a data‑quality limitation (about **32%** of records), since missing age can hide or distort evidence of age‑related bias.[file:1]
+A logistic regression controlling for income, credit history months, debt-to-income ratio, and savings balance shows that **gender remains a significant predictor of approval** (coefficient = -0.339). This indicates the gender gap is not fully explained by financial differences and points to direct or indirect discrimination in the lending process.
 
-We group applicants into three age bands with the following approval rates:
+### Age-based approval patterns
 
-- **<30**: **39.7%**
-- **30–50**: **62.3%**
-- **50+**: **61.9%**
+Applicants are grouped into three age bands based on date of birth (reference year 2024). Only 4 records (0.8%) have missing age after cleaning.
 
-Treating applicants **<30** as the unprivileged group, the disparate impact ratios for <30 vs 30–50 and <30 vs 50+ are both well below 0.8, signalling a strong age‑related disparity that warrants governance attention.[file:1] In contrast, 30–50 and 50+ have very similar approval rates. For approved loans only, average interest rates and approved amounts are broadly comparable across age bands, so—as with gender—the key issue is who gets approved rather than how approved customers are treated. We recommend complementing this with multivariate analysis (e.g., including age, income, credit‑history months, and debt‑to‑income) to test whether the penalty for younger applicants persists after controlling for financial risk factors.
+| Age Group | Approval Rate | DI vs 30-50 |
+|-----------|--------------|-------------|
+| <30 | 40.5% | 0.618 |
+| 30-50 | 65.5% | (reference) |
+| 50+ | 57.6% | 0.880 |
 
-### Proxy discrimination – ZIP code as a proxy for gender
+The <30 group faces a DI of 0.618 against the 30-50 reference group — well below the 0.80 threshold. A chi-square test confirms statistical significance (chi-sq = 21.31, p < 0.0001). Among approved loans, younger applicants receive smaller loan amounts (43,489 vs 48,479 for 30-50).
 
-We investigate whether `zip_code` can act as a proxy for gender. Aggregating applications by ZIP and `gender_clean` shows that, in the filtered sample of ZIPs with at least 5 applications, **none** of the ZIP codes contain both male and female applicants; all 15 ZIPs are effectively single‑gender, with a “purity” of 1.0 (for example, ZIP 10004 has 6 male and 0 female applications). This means that even if the explicit gender field is removed from the model, a classifier using ZIP could still infer gender with very high confidence and reproduce gender disparities while appearing neutral.[file:1]
+### Age x Gender interaction
 
-For this reason, ZIP should be treated as a **high‑risk feature**: its use should be strongly justified, potentially coarsened (e.g., to broader regions), and monitored with additional fairness checks to prevent indirect discrimination.
+| Age Group | Female | Male | Gap (M - F) |
+|-----------|--------|------|-------------|
+| <30 | 30.6% | 52.7% | 22.1 pp |
+| 30-50 | 58.9% | 71.1% | 12.2 pp |
+| 50+ | 52.2% | 64.1% | 11.9 pp |
 
+Women under 30 face a double disadvantage with the lowest approval rate in the dataset (30.6%). The gender gap is largest for the <30 group (22.1 pp), indicating that fairness interventions should target specific subgroups rather than applying uniform corrections.
+
+### Proxy discrimination — ZIP code
+
+Using Cramer's V to measure association between categorical variables:
+
+| Variable Pair | Cramer's V | Interpretation |
+|---------------|-----------|----------------|
+| ZIP vs Gender | **0.627** | Strong association |
+| ZIP vs Age Group | 0.12 | Weak association |
+| Gender vs Age Group | ~0.00 | No association |
+
+ZIP code is strongly correlated with gender (V = 0.627), meaning a model using ZIP could reproduce gender disparities even if the gender field is removed. ZIP should be removed or coarsened (e.g., to broader regions) before model training.
+
+### Rejection reason patterns
+- `algorithm_risk_score` is the dominant rejection reason across all groups.
+- Rejection reasons do **not** differ significantly by gender (chi-sq = 2.58, p = 0.46).
+- Rejection reasons **do** differ significantly by age group (chi-sq = 13.09, p = 0.04).
+- Opaque algorithm-based rejections are a governance concern under GDPR Art. 22, which requires meaningful information about automated decision-making logic.
 
 ## Governance Recommendations
+
 ### Governance Overview
-This section evaluates the dataset and credit scoring model from a governance and regulatory compliance perspective.
-The main objective is to identify and analyse the PII (Personal Identifiable Information), assess GDPR compliance, classify the system under the EU AI Act and propose governance controls.
+This section evaluates the dataset and credit scoring model from a governance and regulatory compliance perspective. The main objective is to identify and analyse PII (Personal Identifiable Information), assess GDPR compliance, classify the system under the EU AI Act, and propose governance controls.
 
-### Identification of the Data
-Identification of Personal Data (PII) Under the Article 4 of the GDPR, personal data means “any information relating to an identified or identifiable natural person (the data subject)”, directly or indirectly. These identifiers have one or more factors related with physical, cultural, economic or social identity of a (natural) person.  Based on this definition, the dataset used for the credit score analysis contains some attributes that are considered as Personal Identifiable Information. 
+### Identification of Personal Data (PII)
 
-Direct identifiers enable to identify an individual immediately such as:
-- full_name - that directly reveals the identity of the individual.
-- email - a unique contact identifier linked to a specific person.
-- ssn (social security number) - a unique national identification number that unequivocally identifies an individual in a whole national system.
-These fields present a high identification risk and require strict protection of the data, including access, control and lawful processing, according to Art. 6 of GDPR.
+Under Article 4 of the GDPR, personal data means "any information relating to an identified or identifiable natural person." The dataset contains the following PII:
 
-Indirect identifiers includes attributes that may not identify a person directly or independently, just combined with other data. In this case, the attributes are quasi-identifiers that significantly increases (re-)identification risk when combined with other attributes such as demographic data. For example:
-- ip_address
-- date_of_birth
-- zip_code
-Even though these fields are not always uniquely identifying on their own, they relate to identifiable individuals when processed in combination, under the scope of GDPR.
+**Direct identifiers** (high re-identification risk):
+- `full_name` — directly reveals the identity of the individual.
+- `email` — a unique contact identifier linked to a specific person.
+- `ssn` (Social Security Number) — a unique national identification number that unequivocally identifies an individual.
 
-Additionally, spending_behavior is flagged as sensitive behavioral data. Although it is not a direct identifier, it reveals patterns about a person's financial habits and lifestyle, which can be used to infer protected characteristics (e.g., religion, health status). Under GDPR, behavioral data that carries this inferential risk should be treated with the same caution as traditional PII.
+These fields require strict protection including access control and lawful processing under Art. 6 GDPR.
+
+**Quasi-identifiers** (re-identification risk when combined):
+- `ip_address`
+- `date_of_birth`
+- `zip_code`
+
+These relate to identifiable individuals when processed in combination, falling under the scope of GDPR.
+
+**Sensitive behavioral data:**
+- `spending_behavior` — reveals patterns about financial habits and lifestyle, which can be used to infer protected characteristics (e.g., religion, health status). Under GDPR, behavioral data carrying inferential risk should be treated with the same caution as traditional PII.
 
 | Field | PII Type | Risk Level |
 |---|---|---|
@@ -83,43 +117,64 @@ Additionally, spending_behavior is flagged as sensitive behavioral data. Althoug
 | `spending_behavior` | Sensitive behavioral data | Medium-High |
 
 ### Pseudonymization Measures
-Pseudonymization refers to the processing of personal data in such a way that it can no longer be attributed to a specific data subject without the use of additional information. Pseudonymization reduces the risk of (re-)identification while maintaining data utility for analytical purposes. In this case, sensitive identifiers such as the Social Security Number (SSN) are pseudonymized using an encrypted hashing function (e.g., SHA-256). The original SSN values are replaced with hashed representations, thereby preventing direct identification while preserving uniqueness for analytical consistency. Also, this is a one-way measure, it means that, it is not possible to reverse the hash back to the ssn without the original value.
+Pseudonymization reduces the risk of re-identification while maintaining data utility. The SSN field is pseudonymized using SHA-256 hashing — original values are replaced with irreversible hashed representations, preventing direct identification while preserving uniqueness for analytical consistency. The original SSN column is then dropped from the dataset. See `03-privacy-demo.ipynb` for the full demonstration.
 
 ### GDPR Provisions
-The use of personal data in credit scoring must be assessed based on the key GDPR provisions:
-- The Article 5 (Principles Relating of Processing of Personal Data) establishes core data protection principle - data minimization. This implies that only data strictly necessary for the credit risk assessment are going to be processed ( e.g., ssn should not be retained beyond identity verification purposes and direct identifiers such as name may not be relevant (and required) for model training. Also, the Article 5 limits the storage of the data only for as long as necessary (e.g., duration of data storage or periodic review of stored datasets).
-- The Article 6 (Lawfulness of Processing) means that processing personal data (for credit scoring) relies on contractual necessity and legitimate interest, requiring an evaluation of the application prior to entering into a contract and demonstrating that the organization’s interests do not override the fundamental rights and freedoms of the data subject, respectively. In our case, analysing the credit score is a legitimate interest and is a contractual necessity.
-- The Article 17 (Right to Erasure or Right to “be forgotten”) indicate that, under certain conditions, users can request to delete their personal data (backups included). In our project, no erasure mechanism was demonstrated in the pipeline.
-- The Article 22 (Automated individual decision-making) directly restricts (purely) automated decision-making that produces significant legal effects, which credit scores clearly does. In this case, NovaCred must either obtain explicit consent, rely on contractual necessity, or implement suitable safeguards. This is not just a control to implement, it is a legal gate that must be cleared before the system can operate at all.
+The use of personal data in credit scoring must be assessed against key GDPR provisions:
+
+- **Article 5 (Data Minimisation & Storage Limitation)**: Only data strictly necessary for credit risk assessment should be processed. SSN should not be retained beyond identity verification; direct identifiers like `full_name` may not be required for model training. Storage must be limited to what is necessary — no retention policy is currently defined.
+- **Article 6 (Lawfulness of Processing)**: Processing for credit scoring relies on contractual necessity and legitimate interest, requiring that the organization's interests do not override the data subject's fundamental rights.
+- **Article 17 (Right to Erasure)**: Under certain conditions, users can request deletion of their personal data. No erasure mechanism was demonstrated in the current pipeline.
+- **Article 22 (Automated Decision-Making)**: Directly restricts purely automated decision-making that produces significant legal effects — which credit scoring clearly does. NovaCred must either obtain explicit consent, rely on contractual necessity, or implement suitable safeguards. The current dataset contains **no field tracking whether consent was collected** — this is a compliance gap that must be addressed before deployment.
 
 ### EU AI Act Reference
-Under Annex III of the EU AI Act, AI systems used for credit scoring and evaluation of creditworthiness are classified as High-Risk AI systems. This classification imposes substantial compliance obligations on providers and deployers, e.g., a robust data governance and quality control, human oversight measures a documented risk management system or transparency and user information requirements. The fairness metrics computed in 02-data-scientist.ipynb (Disparate Impact ratio and Demographic Parity) are directly relevant. Under the EU AI Act, high-risk systems must demonstrate they do not produce discriminatory outcomes across protected groups (gender, age). Those findings should be reviewed as part of any conformity assessment.
+Under Annex III, point 5(b) of the EU AI Act, AI systems used for credit scoring are classified as **High-Risk AI systems**. This imposes compliance obligations including robust data governance and quality control, human oversight measures, a documented risk management system, and transparency requirements. The fairness metrics computed in `02-bias-analysis.ipynb` (Disparate Impact ratio, Demographic Parity difference) are directly relevant — high-risk systems must demonstrate they do not produce discriminatory outcomes across protected groups. These findings should be reviewed as part of any conformity assessment.
 
 ### Proposed Governance Controls
-In the case of NovaCred, since it works high-risk personal data and its processing for a credit application, these are the suggested governance controls to ensure regulatory compliance, accountability and ethical use: 
-- Audit Trail: Every decision model should be automatically logged with a timestamp, the input features that were used and the output decision (if it was rejected or not). This allows NovaCred to explain any decisions, for customers or for auditing services, creating a traceable history.
-- Human oversight: In borderline cases (e.g., applicants with credit score right at the approval threshold) should be manually reviewed instead of receiving a fully automated decision. This is required, by EU AI Act and GDPR (Article 22), to protect individuals from purely algorithmic decisions that significantly affects them.
-- Consent and Transparency: Before processing data through an automated system, applicants must be clearly informed that an algorithm will evaluate their application and give explicit consent. Under GDPR Article 22, automated decision-making with significant effects (like a loan rejection) is only lawful under specific conditions, including the data subject's consent. Importantly, the current dataset contains no field tracking whether consent was collected. This is a compliance gap that must be addressed before deployment.
-- Retention and Data Lifecycle Policy: NovaCred must define a maximum retention period (e.g., 5 years), after which all PII fields must be deleted or fully anonymized. This is required by the Storage Limitation Principle (Article 5) that, as previously said, prohibits keeping personal information longer than necessary for its original purpose.
+
+1. **Audit Trail**: Every model decision should be automatically logged with a timestamp, the input features used, and the output decision. This allows NovaCred to explain any decisions to customers or auditing services, creating a traceable history.
+2. **Human Oversight**: Borderline cases (e.g., applicants near the approval threshold) should be flagged for manual review instead of receiving a fully automated decision, as required by the EU AI Act and GDPR Art. 22.
+3. **Consent and Transparency**: Applicants must be clearly informed that an algorithm will evaluate their application and give explicit consent. The current dataset contains no consent tracking field — this compliance gap must be addressed before deployment.
+4. **Retention and Data Lifecycle Policy**: NovaCred must define a maximum retention period (e.g., 5 years), after which all PII fields must be deleted or fully anonymized, as required by the Storage Limitation Principle (Art. 5).
 
 ## Repository Structure
 ```
 dego-project-team14/
-├── README.md
+├── README.md                          # Project overview & findings summary
 ├── data/
-│   └── raw_credit_applications.json
+│   ├── raw_credit_applications.json   # Original dataset (502 records)
+│   └── cleaned_credit_applications.csv # Cleaned dataset (500 records)
 ├── notebooks/
-│   ├── 01-data-quality.ipynb
-│   ├── 02-bias-analysis.ipynb
-│   └── 03-privacy-demo.ipynb
+│   ├── 01-data-quality.ipynb          # Data quality audit & remediation
+│   ├── 02-bias-analysis.ipynb         # Bias detection & fairness analysis
+│   └── 03-privacy-demo.ipynb          # PII identification & pseudonymization
 ├── src/
-│   └── fairness_utils.py
+│   └── __init__.py
 └── presentation/
-    └── final deliverables
+    ├── DEGO_Group_14_Final_Report.pptx
+    └── Project_Tracking.md
 ```
 ---
 
 ## How to Run
 
+### Prerequisites
+```bash
+pip install pandas numpy matplotlib seaborn scipy fairlearn scikit-learn
+```
+
+### Execution Order
+Run the notebooks sequentially — each builds on the output of the previous one:
+
+1. **`01-data-quality.ipynb`** — Loads `raw_credit_applications.json`, performs quality audit, exports `cleaned_credit_applications.csv`
+2. **`02-bias-analysis.ipynb`** — Loads the cleaned CSV, computes fairness metrics and bias analysis
+3. **`03-privacy-demo.ipynb`** — Loads the cleaned CSV, identifies PII, demonstrates pseudonymization
 
 ## Individual Contributions
+
+| Team Member | Role | Key Contributions |
+|---|---|---|
+| **Lenn Schneidewind** | Data Engineer | Data loading and JSON flattening pipeline, data quality analysis across all four dimensions (completeness, consistency, validity, accuracy), data cleaning and imputation strategy, export of cleaned dataset for downstream analysis |
+| **Fatima Zubair** | Data Scientist | Gender and age bias analysis with disparate impact ratios, chi-square significance tests, Fairlearn MetricFrame integration, Cramer's V proxy correlation analysis, age x gender interaction effects, logistic regression confounder analysis, rejection reason analysis |
+| **Eduarda Dionisio** | Governance Officer | PII identification and classification, SHA-256 pseudonymization demonstration, GDPR article mapping (Art. 5, 6, 17, 22), EU AI Act high-risk classification, governance controls proposal, privacy notebook development |
+| **Leon Schmidt** | Product Lead | Repository setup and management, README documentation, project tracking and coordination, PR reviews and branch merges, presentation preparation, code review and bug fixes across all notebooks |
