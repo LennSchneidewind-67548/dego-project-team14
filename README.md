@@ -42,10 +42,14 @@ The data quality analysis (`01-data-quality.ipynb`) audited the raw dataset of 5
 ### Validity
 - **Negative credit history months**: 2 records (0.4%) had negative values. Imputed with median (48.0 months).
 - **Non-positive income**: 1 record (0.2%) had an invalid income value. Imputed with mean ($82,735).
+- **Out-of-range debt-to-income**: 1 record (0.2%) had `debt_to_income > 1`, indicating a likely business-rule validation gap in a decision-critical field.
+- **Negative savings balance**: 1 record (0.2%) had a negative `savings_balance` value, which is implausible unless overdraft semantics are explicitly documented.
+- **Canonical income missing at decision time**: 3 approved applications were missing the documented `financials.annual_income` field before reconciliation with `financials.annual_salary`, weakening auditability even though the downstream cleaning step recovered the income values.
 - **Future dates of birth**: 0 records — all DOBs were valid.
 - **Invalid ages**: 0 records outside the 18–120 range.
 - **Invalid email formats**: 4 records (0.8%) had malformed email addresses. Set to NaN.
 - **Spending amounts**: All 827 nested spending entries were valid (0 non-numeric, 0 negative, 0 zero).
+- **Interest-rate plausibility**: 0 approved loans had interest rates outside a conservative 0%–25% commercial range.
 - All imputed values are flagged in dedicated columns (`income_imputed`, `credit_history_imputed`) for transparency.
 
 ### Accuracy
@@ -66,7 +70,7 @@ Gender values were standardized in the data quality pipeline (`M`/`F` mapped to 
 - Disparate impact ratio (Female vs Male): **0.767**
 - Demographic parity difference (Female - Male): **-15.4 percentage points**
 
-A DI ratio of 0.767 is below the 0.80 four-fifths-rule threshold, indicating potential disparate impact against female applicants. A chi-square test confirms this is statistically significant (chi-sq = 11.51, p = 0.0007). Among approved loans, average interest rates are similar across genders, but females receive lower average approved amounts (46,669 vs 48,963), suggesting disparity extends beyond the approval decision.
+A DI ratio of 0.767 is below the 0.80 four-fifths-rule threshold, indicating potential disparate impact against female applicants. A chi-square test confirms this is statistically significant (chi-sq = 11.51, p = 0.0007). Among approved loans, average interest rates are similar across genders, and a Welch's t-test does **not** detect a statistically significant pricing difference (p = 0.313), but females still receive lower average approved amounts (46,669 vs 48,963), suggesting disparity extends beyond the approval decision.
 
 ### Confounder-controlled analysis
 
@@ -82,7 +86,7 @@ Applicants are grouped into three age bands based on date of birth (reference ye
 | 30-50 | 65.2% | (reference) |
 | 50+ | 58.1% | 1.121 |
 
-The <30 group faces a DI of 0.629 against the 30-50 reference group — well below the 0.80 threshold. A chi-square test confirms statistical significance (chi-sq = 20.07, p < 0.0001). Among approved loans, younger applicants receive smaller loan amounts (43,896 vs 48,461 for 30-50).
+The <30 group faces a DI of 0.629 against the 30-50 reference group — well below the 0.80 threshold. A chi-square test confirms statistical significance (chi-sq = 20.07, p < 0.0001). Among approved loans, younger applicants receive smaller loan amounts (43,896 vs 48,461 for 30-50). A simple conditional logistic regression with age plus financial covariates yields only a very small standardized age coefficient (about -0.03), suggesting the raw age gap weakens substantially once financial profiles are taken into account.
 
 ### Age x Gender interaction
 
@@ -149,14 +153,16 @@ These relate to identifiable individuals when processed in combination, falling 
 | `spending_behavior` | Sensitive behavioral data | Medium-High |
 
 ### Pseudonymization Measures
-Pseudonymization reduces the risk of re-identification while maintaining data utility. The SSN field is pseudonymized using SHA-256 hashing — original values are replaced with irreversible hashed representations, preventing direct identification while preserving uniqueness for analytical consistency. The original SSN column is then dropped from the dataset. See `03-privacy-demo.ipynb` for the full demonstration.
+Pseudonymization reduces the risk of re-identification while maintaining data utility. The SSN field is pseudonymized using SHA-256 hashing — original values are replaced with irreversible hashed representations, preventing direct identification while preserving uniqueness for analytical consistency. The original SSN column is then dropped from the dataset. However, direct identifiers and simple quasi-identifier combinations remain highly unique, so the cleaned analytical dataset is still readily re-identifiable if shared broadly. See `03-privacy-demo.ipynb` for the full demonstration.
 
 ### GDPR Provisions
 The use of personal data in credit scoring must be assessed against key GDPR provisions:
 
 - **Article 5 (Data Minimisation & Storage Limitation)**: Only data strictly necessary for credit risk assessment should be processed. SSN should not be retained beyond identity verification; direct identifiers like `full_name` may not be required for model training. Storage must be limited to what is necessary — no retention policy is currently defined.
 - **Article 6 (Lawfulness of Processing)**: Processing for credit scoring relies on contractual necessity and legitimate interest, requiring that the organization's interests do not override the data subject's fundamental rights.
+- **Article 25 (Privacy by Design and by Default)**: Direct identifiers remain in the analytical dataset, so privacy-preserving defaults are not yet enforced at the dataset layer.
 - **Article 17 (Right to Erasure)**: Under certain conditions, users can request deletion of their personal data. No erasure mechanism was demonstrated in the current pipeline.
+- **Article 35 (Data Protection Impact Assessment)**: Because automated credit decisioning has significant legal effects, NovaCred should complete a DPIA before any operational deployment.
 - **Article 22 (Automated Decision-Making)**: Directly restricts purely automated decision-making that produces significant legal effects — which credit scoring clearly does. NovaCred must either obtain explicit consent, rely on contractual necessity, or implement suitable safeguards. The current dataset contains **no field tracking whether consent was collected** — this is a compliance gap that must be addressed before deployment.
 
 ### EU AI Act Reference
