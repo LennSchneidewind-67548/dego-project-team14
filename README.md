@@ -181,7 +181,9 @@ dego-project-team14/
 │   ├── 02-bias-analysis.ipynb         # Bias detection & fairness analysis
 │   └── 03-privacy-demo.ipynb          # PII identification & pseudonymization
 ├── src/
-│   └── __init__.py
+│   ├── __init__.py
+│   └── data_loading.py                # Reusable raw-data loading helper
+├── requirements.txt                   # Minimal Python dependencies
 └── presentation/
     ├── DEGO_Group_14_Final_Report.pptx
     └── Project_Tracking.md
@@ -192,15 +194,25 @@ dego-project-team14/
 
 ### Prerequisites
 ```bash
-pip install pandas numpy matplotlib seaborn scipy fairlearn scikit-learn
+pip install -r requirements.txt
 ```
 
+### Pipeline
+The notebooks form a lightweight sequential workflow:
+
+1. **`01-data-quality.ipynb`** — uses `src.data_loading.load_raw_data()` to load `data/raw_credit_applications.json`, performs the data quality audit, and exports `data/cleaned_credit_applications.csv`
+2. **`02-bias-analysis.ipynb`** — loads the cleaned CSV and computes fairness metrics, proxy analysis, and subgroup comparisons
+3. **`03-privacy-demo.ipynb`** — loads the cleaned CSV, identifies PII, and demonstrates pseudonymization
+
 ### Execution Order
-Run the notebooks sequentially — each builds on the output of the previous one:
+Run the notebooks sequentially from the repository root or inside Jupyter:
 
 1. **`01-data-quality.ipynb`** — Loads `raw_credit_applications.json`, performs quality audit, exports `cleaned_credit_applications.csv`
 2. **`02-bias-analysis.ipynb`** — Loads the cleaned CSV, computes fairness metrics and bias analysis
 3. **`03-privacy-demo.ipynb`** — Loads the cleaned CSV, identifies PII, demonstrates pseudonymization
+
+### Workflow Tracking
+Team milestone tracking, ownership, and final submission checks are documented in [`presentation/Project_Tracking.md`](presentation/Project_Tracking.md). This file serves as the repository's collaboration artifact alongside the commit and pull request history.
 
 ## Individual Contributions
 

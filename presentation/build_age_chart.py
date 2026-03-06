@@ -8,7 +8,6 @@ GRAY   = "#1A1A2E"   # third colour for additional groupings
 
 df = pd.read_csv("data/cleaned_credit_applications.csv")
 
-# ── Reproduce notebook calculations exactly ────────────────────────────
 gender_col   = "applicant_info.gender"
 decision_col = "decision.loan_approved"
 
