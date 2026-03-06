@@ -6,7 +6,7 @@ This report presents the findings of a data governance audit conducted on NovaCr
 
 **Key findings:**
 - **Data quality**: 6 categories of issues identified and remediated: Duplicate records (2), inconsistent data types (income stored as string), 4 gender coding variants, inconsistent date formats, invalid values (negative credit history, non-positive income, invalid emails), and missing/incomplete fields across 13 columns. Final dataset retention rate: 99.6%.
-- **Bias**: The gender disparate impact ratio is **0.77** (below the 0.80 four-fifths threshold), confirmed as statistically significant (p = 0.0008). A logistic regression controlling for financial covariates shows gender remains a significant predictor of approval. Applicants under 30 face a DI of **0.62** against the 30–50 group. ZIP code acts as a strong gender proxy (Cramer's V = 0.63).
+- **Bias**: The gender disparate impact ratio is **0.77** (below the 0.80 four-fifths threshold), confirmed as statistically significant (p = 0.0007). A logistic regression controlling for financial covariates shows gender remains a significant predictor of approval. Applicants under 30 face a DI of **0.63** against the 30–50 group. ZIP code acts as a strong gender proxy (Cramer's V = 0.63).
 - **Governance gaps**: 7 PII fields stored without protection, no consent tracking mechanism, no data retention policy, no erasure mechanism, and no audit trail for automated decisions. Credit scoring is classified as high-risk under the EU AI Act (Annex III, 5b), requiring conformity assessment before deployment.
 
 ## Team Members
@@ -61,12 +61,12 @@ The bias analysis (`02-bias-analysis.ipynb`) investigates disparate impact acros
 
 Gender values were standardized in the data quality pipeline (`M`/`F` mapped to `Male`/`Female`). Records with missing or invalid gender are excluded from binary comparisons.
 
-- Approval rate (Male): **65.9%**
+- Approval rate (Male): **66.0%**
 - Approval rate (Female): **50.6%**
-- Disparate impact ratio (Female vs Male): **0.768**
-- Demographic parity difference (Female - Male): **-15.2 percentage points**
+- Disparate impact ratio (Female vs Male): **0.767**
+- Demographic parity difference (Female - Male): **-15.4 percentage points**
 
-A DI ratio of 0.768 is below the 0.80 four-fifths-rule threshold, indicating potential disparate impact against female applicants. A chi-square test confirms this is statistically significant (chi-sq = 11.16, p = 0.0008). Among approved loans, average interest rates are similar across genders, but females receive lower average approved amounts (46,480 vs 48,988), suggesting disparity extends beyond the approval decision.
+A DI ratio of 0.767 is below the 0.80 four-fifths-rule threshold, indicating potential disparate impact against female applicants. A chi-square test confirms this is statistically significant (chi-sq = 11.51, p = 0.0007). Among approved loans, average interest rates are similar across genders, but females receive lower average approved amounts (46,669 vs 48,963), suggesting disparity extends beyond the approval decision.
 
 ### Confounder-controlled analysis
 
@@ -78,11 +78,11 @@ Applicants are grouped into three age bands based on date of birth (reference ye
 
 | Age Group | Approval Rate | DI vs 30-50 |
 |-----------|--------------|-------------|
-| <30 | 40.5% | 0.618 |
-| 30-50 | 65.5% | (reference) |
-| 50+ | 57.6% | 0.880 |
+| <30 | 41.0% | 0.629 |
+| 30-50 | 65.2% | (reference) |
+| 50+ | 58.1% | 1.121 |
 
-The <30 group faces a DI of 0.618 against the 30-50 reference group — well below the 0.80 threshold. A chi-square test confirms statistical significance (chi-sq = 21.31, p < 0.0001). Among approved loans, younger applicants receive smaller loan amounts (43,489 vs 48,479 for 30-50).
+The <30 group faces a DI of 0.629 against the 30-50 reference group — well below the 0.80 threshold. A chi-square test confirms statistical significance (chi-sq = 20.07, p < 0.0001). Among approved loans, younger applicants receive smaller loan amounts (43,896 vs 48,461 for 30-50).
 
 ### Age x Gender interaction
 

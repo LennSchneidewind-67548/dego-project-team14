@@ -7,26 +7,35 @@ PLUM   = "#7d233e"
 GRAY   = "#1A1A2E"   # third colour for additional groupings
 
 df = pd.read_csv("data/cleaned_credit_applications.csv")
+
+# ── Reproduce notebook calculations exactly ────────────────────────────
+gender_col   = "applicant_info.gender"
+decision_col = "decision.loan_approved"
+
+mask = df[gender_col].isin(["Male", "Female"])
+
 df["dob"] = pd.to_datetime(df["applicant_info.date_of_birth"], errors="coerce")
-today = pd.Timestamp("2026-03-05")
-df["age"] = (today - df["dob"]).dt.days / 365.25
+df["age"] = 2024 - df["dob"].dt.year
+df["age_group"] = pd.cut(df["age"], bins=[0, 30, 50, 120], labels=["<30", "30-50", "50+"])
 
-def age_group(a):
-    if a < 30:   return "<30"
-    elif a <= 50: return "30-50"
-    else:         return "50+"
+# Overall approval by age group (matches notebook's approval_by_age)
+overall_frac = (
+    df.dropna(subset=["age_group"])
+      .groupby("age_group", observed=False)[decision_col]
+      .mean()
+)
 
-df["age_group"] = df["age"].apply(age_group)
+# Age × Gender (matches notebook's age_gender_approval)
+cross_frac = (
+    df[mask & df["age_group"].notna()]
+      .groupby(["age_group", gender_col], observed=False)[decision_col]
+      .mean()
+      .unstack()
+)
 
 ORDER   = ["<30", "30-50", "50+"]
-overall = df.groupby("age_group")["decision.loan_approved"].mean() * 100
-overall = overall.reindex(ORDER)
-
-cross = (
-    df.groupby(["age_group", "applicant_info.gender"])["decision.loan_approved"]
-    .mean() * 100
-).unstack()
-cross = cross.reindex(ORDER)
+overall = overall_frac.reindex(ORDER) * 100
+cross   = cross_frac.reindex(ORDER) * 100
 
 ref_rate   = overall.max()
 threshold  = ref_rate * 0.8
