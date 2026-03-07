@@ -4,4 +4,5 @@ matplotlib
 seaborn
 scipy
 scikit-learn
-fairlearn
+fairlearn==0.13.0; python_version < "3.14"
+fairlearn @ git+https://github.com/fairlearn/fairlearn.git@main; python_version >= "3.14"
