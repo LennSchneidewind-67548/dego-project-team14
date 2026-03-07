@@ -7,9 +7,11 @@ __pycache__/
 # C extensions
 *.so
 
-# Mac DS_Store file
+# Mac / Office temp files
 .DS_Store
 Thumbs.db
+~$*.docx
+*.swp
 
 # Distribution / packaging
 .Python
@@ -82,6 +84,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.ipynb_checkpoints/
 
 # IPython
 profile_default/
