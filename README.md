@@ -13,6 +13,7 @@ This report presents the findings of a data governance audit conducted on NovaCr
 
 - [Team Members](#team-members)
 - [Project Description](#project-description)
+- [Presentation Video](#presentation-video)
 - [Data Quality Findings](#data-quality-findings)
 - [Bias Detection & Fairness](#bias-detection--fairness)
 - [Governance Recommendations](#governance-recommendations)
@@ -32,6 +33,10 @@ This report presents the findings of a data governance audit conducted on NovaCr
 
 ## Project Description
 NovaCred is a fintech startup that uses machine learning to make credit decisions. Following a regulatory inquiry about potential discrimination in their lending practices, our team was hired to audit the data for quality issues, detect bias patterns in historical decisions, propose governance controls, and demonstrate compliance with GDPR and AI Act requirements.
+
+## Presentation Video
+
+[Watch the project video presentation](https://youtu.be/jfb5Onc2HLQ)
 
 ## Data Quality Findings
 

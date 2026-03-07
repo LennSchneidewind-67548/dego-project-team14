@@ -39,6 +39,8 @@ def main() -> None:
         + count_true_flags(clean["savings_review_flag"])
     )
 
+    duplicate_ssns = 2
+
     labels = [
         "Date format\nstandardization",
         "Income normalization\n(string -> numeric)",
@@ -46,6 +48,7 @@ def main() -> None:
         "Invalid/reviewed values\n(credit, email, DTI, savings)",
         "Income recovered\nfrom annual_salary",
         "Duplicate IDs",
+        "Duplicate SSNs",
     ]
     values = [
         date_standardized,
@@ -54,6 +57,7 @@ def main() -> None:
         invalid_or_reviewed,
         income_recovered,
         duplicate_ids_removed,
+        duplicate_ssns,
     ]
 
     fig, ax = plt.subplots(figsize=(12, 7))
@@ -87,19 +91,6 @@ def main() -> None:
     ax.spines["bottom"].set_visible(False)
     ax.spines["left"].set_color("#bdbdbd")
     ax.spines["left"].set_linewidth(2)
-
-    fig.text(
-        0.12,
-        0.02,
-        "Additional plausibility checks found 1 invalid DTI and 1 negative savings value; "
-        "both were flagged for review and set to NaN, while 5 incomes were recovered from "
-        "annual_salary with provenance tracking.",
-        ha="left",
-        va="bottom",
-        fontsize=13,
-        color=TEXT,
-        wrap=True,
-    )
 
     plt.tight_layout()
     plt.subplots_adjust(bottom=0.18)
