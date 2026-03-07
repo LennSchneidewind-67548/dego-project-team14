@@ -5,9 +5,9 @@
 This report presents the findings of a data governance audit conducted on NovaCred's credit application dataset (502 records). Acting as a Data Governance Task Force, we identified and remediated data quality issues across four dimensions, detected statistically significant bias against female and younger applicants, and assessed the system's compliance with GDPR and the EU AI Act.
 
 **Key findings:**
-- **Data quality**: 6 categories of issues identified and remediated: Duplicate records (2), inconsistent data types (income stored as string), 4 gender coding variants, inconsistent date formats, invalid values (negative credit history, non-positive income, invalid emails), and missing/incomplete fields across 13 columns. Final dataset retention rate: 99.6%.
+- **Data quality**: 6 categories of issues identified and remediated: Duplicate records (2), inconsistent data types (income stored as string), 4 gender coding variants, inconsistent date formats, invalid values (negative credit history, non-positive income, invalid emails), missing/incomplete fields across 13 columns, and additional plausibility issues such as out-of-range DTI and negative savings. Final dataset retention rate: 99.6%.
 - **Bias**: The gender disparate impact ratio is **0.77** (below the 0.80 four-fifths threshold), confirmed as statistically significant (p = 0.0007). A logistic regression controlling for financial covariates shows gender remains a significant predictor of approval. Applicants under 30 face a DI of **0.63** against the 30–50 group. ZIP code acts as a strong gender proxy (Cramer's V = 0.63).
-- **Governance gaps**: 7 PII fields stored without protection, no consent tracking mechanism, no data retention policy, no erasure mechanism, and no audit trail for automated decisions. Credit scoring is classified as high-risk under the EU AI Act (Annex III, 5b), requiring conformity assessment before deployment.
+- **Governance gaps**: 7 core PII fields were identified alongside additional linkage-relevant fields such as `_id`, `processing_timestamp`, `loan_purpose`, `notes`, and `gender`. The dataset remains highly re-identifiable, and no consent tracking, retention policy, erasure mechanism, or audit trail is demonstrated. Credit scoring is classified as high-risk under the EU AI Act (Annex III, 5b), requiring conformity assessment before deployment.
 
 ## Table of Contents
 
@@ -62,12 +62,12 @@ The data quality analysis (`01-data-quality.ipynb`) audited the raw dataset of 5
 - **Invalid email formats**: 4 records (0.8%) had malformed email addresses. Set to NaN.
 - **Spending amounts**: All 827 nested spending entries were valid (0 non-numeric, 0 negative, 0 zero).
 - **Interest-rate plausibility**: 0 approved loans had interest rates outside a conservative 0%–25% commercial range.
-- All imputed values are flagged in dedicated columns (`income_imputed`, `credit_history_imputed`) for transparency.
+- All remediation and review actions are flagged in dedicated columns (`income_imputed`, `credit_history_imputed`, `age_imputed`, `income_recovered_from_salary`, `dti_review_flag`, `savings_review_flag`) for transparency.
 
 ### Accuracy
 - **0 exact duplicate rows** found.
 - **2 duplicate application IDs** detected (4 rows sharing 2 IDs). Removed 2 duplicate records, keeping the first occurrence of each.
-- Final dataset: **500 unique records** across 24 columns.
+- Final dataset: **500 unique records** across 27 columns.
 
 ## Bias Detection & Fairness
 
@@ -116,11 +116,11 @@ Using Cramer's V to measure association between categorical variables:
 
 | Variable Pair | Cramer's V | Interpretation |
 |---------------|-----------|----------------|
-| ZIP vs Gender | **0.627** | Strong association |
+| ZIP vs Gender | **0.632** | Strong association |
 | ZIP vs Age Group | 0.12 | Weak association |
 | Gender vs Age Group | ~0.00 | No association |
 
-ZIP code is strongly correlated with gender (V = 0.627), meaning a model using ZIP could reproduce gender disparities even if the gender field is removed. ZIP should be removed or coarsened (e.g., to broader regions) before model training.
+ZIP code is strongly correlated with gender (V = 0.632), meaning a model using ZIP could reproduce gender disparities even if the gender field is removed. This is an audit finding rather than a cleaning step: ZIP is retained in the analysis to document the proxy risk, but it should be removed or coarsened (e.g., to broader regions) before production model training.
 
 ### Rejection reason patterns
 - `algorithm_risk_score` is the dominant rejection reason across all groups.
@@ -154,6 +154,8 @@ These relate to identifiable individuals when processed in combination, falling 
 **Sensitive behavioral data:**
 - `spending_behavior` — reveals patterns about financial habits and lifestyle, which can be used to infer protected characteristics (e.g., religion, health status). Under GDPR, behavioral data carrying inferential risk should be treated with the same caution as traditional PII.
 
+Additional fields such as `_id`, `processing_timestamp`, `loan_purpose`, `notes`, and `applicant_info.gender` are not primary identifiers, but they still qualify as personal or linkage-relevant data under GDPR and can increase re-identification or sensitive-inference risk when combined with the core PII fields above.
+
 | Field | PII Type | Risk Level |
 |---|---|---|
 | `full_name` | Direct identifier | High |
@@ -172,6 +174,8 @@ The use of personal data in credit scoring must be assessed against key GDPR pro
 
 - **Article 5 (Data Minimisation & Storage Limitation)**: Only data strictly necessary for credit risk assessment should be processed. SSN should not be retained beyond identity verification; direct identifiers like `full_name` may not be required for model training. Storage must be limited to what is necessary — no retention policy is currently defined.
 - **Article 6 (Lawfulness of Processing)**: Processing for credit scoring relies on contractual necessity and legitimate interest, requiring that the organization's interests do not override the data subject's fundamental rights.
+- **Article 7 (Conditions for Consent)**: Consent must be specific, informed, and demonstrable. The current dataset contains no field showing whether consent for automated decision-making was obtained.
+- **Article 9 (Special Category Data)**: `loan_purpose` values such as medical use, together with sensitive spending patterns, may enable protected-characteristic inference and therefore require heightened governance.
 - **Article 25 (Privacy by Design and by Default)**: Direct identifiers remain in the analytical dataset, so privacy-preserving defaults are not yet enforced at the dataset layer.
 - **Article 17 (Right to Erasure)**: Under certain conditions, users can request deletion of their personal data. No erasure mechanism was demonstrated in the current pipeline.
 - **Article 35 (Data Protection Impact Assessment)**: Because automated credit decisioning has significant legal effects, NovaCred should complete a DPIA before any operational deployment.
@@ -247,6 +251,6 @@ Team milestone tracking, ownership, and final submission checks are documented i
 | Team Member | Role | Key Contributions |
 |---|---|---|
 | **Lenn Schneidewind** | Data Engineer | Data loading and JSON flattening pipeline, data quality analysis across all four dimensions (completeness, consistency, validity, accuracy), data cleaning and imputation strategy, export of cleaned dataset for downstream analysis |
-| **Fatima Zubair** | Data Scientist | Gender and age bias analysis with disparate impact ratios, chi-square significance tests, Fairlearn MetricFrame integration, Cramer's V proxy correlation analysis, age x gender interaction effects, logistic regression confounder analysis, rejection reason analysis |
-| **Eduarda Dionisio** | Governance Officer | PII identification and classification, SHA-256 pseudonymization demonstration, GDPR article mapping (Art. 5, 6, 17, 22), EU AI Act high-risk classification, governance controls proposal, privacy notebook development |
+| **Fatima Zubair** | Data Scientist | Gender and age bias analysis with disparate impact ratios, chi-square significance tests, Fairlearn MetricFrame integration, Cramer's V proxy correlation analysis, age x gender interaction effects, pricing fairness check, conditional age analysis, logistic regression confounder analysis, rejection reason analysis |
+| **Eduarda Dionisio** | Governance Officer | PII identification and classification, SHA-256 pseudonymization demonstration, re-identification risk assessment, GDPR article mapping (Art. 5, 6, 7, 9, 17, 22, 25, 35), EU AI Act high-risk classification, governance controls proposal, privacy notebook development |
 | **Leon Schmidt** | Product Lead | Repository setup and management, README documentation, project tracking and coordination, PR reviews and branch merges, presentation preparation, code review and bug fixes across all notebooks |
