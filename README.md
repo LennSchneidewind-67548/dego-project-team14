@@ -9,6 +9,18 @@ This report presents the findings of a data governance audit conducted on NovaCr
 - **Bias**: The gender disparate impact ratio is **0.77** (below the 0.80 four-fifths threshold), confirmed as statistically significant (p = 0.0007). A logistic regression controlling for financial covariates shows gender remains a significant predictor of approval. Applicants under 30 face a DI of **0.63** against the 30–50 group. ZIP code acts as a strong gender proxy (Cramer's V = 0.63).
 - **Governance gaps**: 7 PII fields stored without protection, no consent tracking mechanism, no data retention policy, no erasure mechanism, and no audit trail for automated decisions. Credit scoring is classified as high-risk under the EU AI Act (Annex III, 5b), requiring conformity assessment before deployment.
 
+## Table of Contents
+
+- [Team Members](#team-members)
+- [Project Description](#project-description)
+- [Data Quality Findings](#data-quality-findings)
+- [Bias Detection & Fairness](#bias-detection--fairness)
+- [Governance Recommendations](#governance-recommendations)
+- [Remediation Summary](#remediation-summary)
+- [Repository Structure](#repository-structure)
+- [How to Run](#how-to-run)
+- [Individual Contributions](#individual-contributions)
+
 ## Team Members
 
 | Role | Name | Student ID |
@@ -175,10 +187,21 @@ Under Annex III, point 5(b) of the EU AI Act, AI systems used for credit scoring
 3. **Consent and Transparency**: Applicants must be clearly informed that an algorithm will evaluate their application and give explicit consent. The current dataset contains no consent tracking field — this compliance gap must be addressed before deployment.
 4. **Retention and Data Lifecycle Policy**: NovaCred must define a maximum retention period (e.g., 5 years), after which all PII fields must be deleted or fully anonymized, as required by the Storage Limitation Principle (Art. 5).
 
+## Remediation Summary
+
+| Area | Evidence | Remediation Applied | Governance Implication |
+|---|---|---|---|
+| Data quality | Duplicate IDs, invalid credit history, invalid income, malformed emails, inconsistent gender/date formats | Removed duplicate application IDs, standardised types and encodings, imputed decision-critical numeric fields, invalid emails set to `NaN` | Produces a cleaner analytical base and a more auditable pipeline |
+| Data quality plausibility | 1 out-of-range `debt_to_income`, 1 negative `savings_balance`, 5 recovered income records from `annual_salary` | Added `dti_review_flag`, `savings_review_flag`, and `income_recovered_from_salary`; invalid values set to `NaN` while preserving audit flags | Keeps downstream analysis usable without hiding validation failures |
+| Bias and fairness | Gender DI = 0.767, strongest harm for women under 30, ZIP strongly correlated with gender | Quantified disparities with chi-square tests, Fairlearn metrics, conditional regression, and proxy analysis | Supports feature review, subgroup monitoring, and fairness controls before deployment |
+| Privacy and governance | Direct identifiers remain present, records are highly re-identifiable, no consent or retention tracking | Demonstrated SSN pseudonymization, mapped GDPR gaps, and defined governance controls for audit trail, oversight, retention, and DPIA | Shows the system is not deployment-ready without legal and procedural safeguards |
+
 ## Repository Structure
 ```
 dego-project-team14/
 ├── README.md                          # Project overview & findings summary
+├── docs/
+│   └── Project_Tracking.md            # Workflow tracking and milestone log
 ├── data/
 │   ├── raw_credit_applications.json   # Original dataset (502 records)
 │   └── cleaned_credit_applications.csv # Cleaned dataset (500 records)
@@ -191,8 +214,7 @@ dego-project-team14/
 │   └── data_loading.py                # Reusable raw-data loading helper
 ├── requirements.txt                   # Minimal Python dependencies
 └── presentation/
-    ├── DEGO_Group_14_Final_Report.pptx
-    └── Project_Tracking.md
+    └── DEGO_Group_14_Final_Report.pptx
 ```
 ---
 
@@ -218,7 +240,7 @@ Run the notebooks sequentially from the repository root or inside Jupyter:
 3. **`03-privacy-demo.ipynb`** — Loads the cleaned CSV, identifies PII, demonstrates pseudonymization
 
 ### Workflow Tracking
-Team milestone tracking, ownership, and final submission checks are documented in [`presentation/Project_Tracking.md`](presentation/Project_Tracking.md). This file serves as the repository's collaboration artifact alongside the commit and pull request history.
+Team milestone tracking, ownership, and final submission checks are documented in [`docs/Project_Tracking.md`](docs/Project_Tracking.md). This file serves as the repository's collaboration artifact alongside the commit and pull request history.
 
 ## Individual Contributions
 
