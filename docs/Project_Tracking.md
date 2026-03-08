@@ -57,18 +57,18 @@
 - [ ] Individual contributions filled in
 
 ### Video
-- [ ] All 4 members recorded and speaking
-- [ ] Duration checked (target: 5:45, max: 6:00, penalty at 7:00+)
-- [ ] Key visualizations shown
-- [ ] Specific numbers cited (DI ratio, duplicate count, etc.)
-- [ ] Uploaded (YouTube unlisted / Google Drive) and link added to README
+- [x] All 4 members recorded and speaking
+- [x] Duration checked (target: 5:45, max: 6:00, penalty at 7:00+)
+- [x] Key visualizations shown
+- [x] Specific numbers cited (DI ratio, duplicate count, etc.)
+- [x] Uploaded (YouTube unlisted / Google Drive) and link added to README
 
 ### Final Submission
-- [ ] All notebooks run clean (restart kernel → run all)
-- [ ] ≥10 meaningful commits, all 4 members have commits
-- [ ] Repo is public
-- [ ] Moodle submission done (GitHub URL)
-- [ ] Deadline: 23:59 day before Session 6
+- [x] All notebooks run clean (restart kernel → run all)
+- [x] ≥10 meaningful commits, all 4 members have commits
+- [x] Repo is public
+- [x] Moodle submission done (GitHub URL)
+- [x] Deadline: 23:59 day before Session 6
 
 ### After Session 6
 - [ ] Peer evaluation submitted on Moodle (within 48h)
